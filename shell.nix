@@ -1,7 +1,7 @@
 let
   nixpkgs = builtins.fetchTarball {
-    url    = "https://github.com/NixOS/nixpkgs/archive/21a3136d25e1652cb32197445e9799e6a5154588.tar.gz";
-    sha256 = "145d474g6dngvaiwq2whqdvaq14ba9pc5pvvcz4x8l2bkwbyn3hg";
+    url    = "https://github.com/NixOS/nixpkgs/archive/f1c9c23aad972787f00f175651e4cb0d7c7fd5ea.tar.gz";
+    sha256 = "01msl5fffdrg7q43amvaqv9m00c2j1y3ihz3xhhnwl56l46df05j";
   };
 
   overlay = pkgsNew: pkgsOld: {

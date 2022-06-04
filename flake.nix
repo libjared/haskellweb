@@ -12,13 +12,16 @@
       pkgs = import nixpkgs {
         inherit system;
       };
-      project = returnShellEnv: (
-        pkgs.haskellPackages.developPackage {
+      project = returnShellEnv: let
+        # hpkgs = pkgs.haskellPackages;
+        hpkgs = pkgs.haskell.packages.ghcjs;
+      in (
+        hpkgs.developPackage {
           inherit returnShellEnv;
           name = "haskellweb";
           root = ./.;
           modifier = drv: (
-            pkgs.haskell.lib.addBuildTools drv (with pkgs.haskellPackages; if returnShellEnv then [
+            pkgs.haskell.lib.addBuildTools drv (with hpkgs; if returnShellEnv then [
               # all optional dependencies that I use for development
               # cabal-fmt
               cabal-install

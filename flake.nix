@@ -34,10 +34,8 @@
       pkgs = import nixpkgs {
         inherit system overlays;
       };
-      project = returnShellEnv: let
-        # hpkgs = pkgs.haskellPackages;
-        hpkgs = pkgs.haskell.packages.ghcjs;
-      in (
+      hpkgs = pkgs.haskell.packages.ghcjs;
+      project = returnShellEnv: (
         hpkgs.developPackage {
           inherit returnShellEnv;
           name = "haskellweb";
@@ -56,8 +54,15 @@
           );
         }
       );
+      built = pkgs.symlinkJoin {
+        name = "haskellweb-wrapped";
+        paths = [ (project false) ];
+        postBuild = ''
+          ln -sf "${./index.html}" "$out"/bin/*.jsexe/index.html
+        '';
+      };
       in {
-        defaultPackage = project false;
+        defaultPackage = built;
         devShell = project true;
       }
     )

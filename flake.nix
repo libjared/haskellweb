@@ -15,16 +15,24 @@
             packages = osuper.haskell.packages // {
               ghcjs = osuper.haskell.packages.ghcjs.override {
                 overrides = (gself: gsuper: {
-                  ghcjs-base = gsuper.ghcjs-base.overrideAttrs (old: {
-                    src = oself.fetchFromGitHub {
-                      owner = "ghcjs";
-                      repo = "ghcjs-base";
-                      rev = "85e31beab9beffc3ea91b954b61a5d04e708b8f2";
-                      sha256 = "15fdkjv0l7hpbbsn5238xxgzfdg61g666nzbv2sgxkwryn5rycv0";
-                      # rev = "85e31beab9beffc3ea91b954b61a5d04e708b8f2";
-                      # sha256 = "sha256-YDOfi/WZz/602OtbY8wL5jX3X+9oiGL1WhceCraczZU=";
-                    };
-                  });
+                  ghcjs-base = gsuper.ghcjs-base.overrideAttrs (old:
+                    let
+                      oldsrc = old.src;
+                      override = if isGitProtocol then { src = ghsrc; } else {};
+                      isGitProtocol = builtins.match "git://.+" oldsrc.url != null;
+                      ghsrc = oself.fetchFromGitHub (
+                        assert oldsrc.outputHashMode == "recursive";
+                        assert oldsrc.outputHashAlgo == "sha256";
+                        {
+                          name = "ghcjs-base-source";
+                          owner = "ghcjs";
+                          repo = "ghcjs-base";
+                          rev = oldsrc.rev;
+                          sha256 = oldsrc.outputHash;
+                        }
+                      );
+                    in override
+                  );
                 });
               };
             };
@@ -62,6 +70,7 @@
         '';
       };
       in {
+        packages.ghcjs-base = pkgs.haskell.packages.ghcjs.ghcjs-base;
         defaultPackage = built;
         devShell = project true;
       }

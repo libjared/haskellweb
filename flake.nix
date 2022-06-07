@@ -3,7 +3,6 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    nixpkgs.url = "github:NixOS/nixpkgs/21a3136d25e1652cb32197445e9799e6a5154588";
   };
 
   outputs = { self, flake-utils, nixpkgs }:
@@ -15,24 +14,11 @@
             packages = osuper.haskell.packages // {
               ghcjs = osuper.haskell.packages.ghcjs.override {
                 overrides = (gself: gsuper: {
-                  ghcjs-base = gsuper.ghcjs-base.overrideAttrs (old:
-                    let
-                      oldsrc = old.src;
-                      override = if isGitProtocol then { src = ghsrc; } else {};
-                      isGitProtocol = builtins.match "git://.+" oldsrc.url != null;
-                      ghsrc = oself.fetchFromGitHub (
-                        assert oldsrc.outputHashMode == "recursive";
-                        assert oldsrc.outputHashAlgo == "sha256";
-                        {
-                          name = "ghcjs-base-source";
-                          owner = "ghcjs";
-                          repo = "ghcjs-base";
-                          rev = oldsrc.rev;
-                          sha256 = oldsrc.outputHash;
-                        }
-                      );
-                    in override
-                  );
+                  aeson = gsuper.aeson.overrideAttrs (old: {
+                    patches = old.patches or [] ++ [
+                      ./patches/0001-Rip-out-short-text.patch
+                    ];
+                  });
                 });
               };
             };

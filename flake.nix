@@ -14,11 +14,15 @@
             packages = osuper.haskell.packages // {
               ghcjs = osuper.haskell.packages.ghcjs.override {
                 overrides = (gself: gsuper: {
-                  aeson = gsuper.aeson.overrideAttrs (old: {
-                    patches = old.patches or [] ++ [
+                  aeson = oself.haskell.lib.compose.overrideCabal (drv: {
+                    patches = drv.patches or [] ++ [
                       ./patches/0001-Rip-out-short-text.patch
                     ];
-                  });
+                    libraryHaskellDepends =
+                      oself.lib.remove gself.text-short drv.libraryHaskellDepends;
+                    testHaskellDepends =
+                      oself.lib.remove gself.text-short drv.testHaskellDepends;
+                  }) gsuper.aeson;
                 });
               };
             };

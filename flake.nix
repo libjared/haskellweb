@@ -20,27 +20,30 @@
             };
           };
         })
+        (oself: osuper: {
+          haskellPackages = osuper.haskellPackages.override {
+            overrides = (gself: gsuper: {
+              ghcjs-base = oself.haskell.lib.compose.markUnbroken gself.ghcjs-base-stub;
+            });
+          };
+        })
       ];
       pkgs = import nixpkgs {
         inherit system overlays;
       };
-      hpkgs = pkgs.haskell.packages.ghcjs;
       project = returnShellEnv: (
-        hpkgs.developPackage {
+        let hpkgs = if returnShellEnv then pkgs.haskellPackages else pkgs.haskell.packages.ghcjs;
+        in hpkgs.developPackage {
           inherit returnShellEnv;
           name = "haskellweb";
           root = ./.;
           modifier = drv: (
-            pkgs.haskell.lib.addBuildTools drv (with hpkgs; if returnShellEnv then [
+            with pkgs.haskell.lib.compose;
+            if returnShellEnv then addBuildTools (with hpkgs; [
               # all optional dependencies that I use for development
-              # cabal-fmt
               cabal-install
-              # ghcid
-              # haskell-language-server
-              # ormolu
-              # pkgs.nixpkgs-fmt
-              # sensei
-            ] else [])
+              sensei
+            ]) drv else drv
           );
         }
       );

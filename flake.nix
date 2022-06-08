@@ -16,13 +16,21 @@
                 overrides = (gself: gsuper: {
                   aeson = oself.haskell.lib.compose.overrideCabal (drv: {
                     patches = drv.patches or [] ++ [
-                      ./patches/0001-Rip-out-short-text.patch
+                      ./patches/short-text-aeson.patch
                     ];
                     libraryHaskellDepends =
                       oself.lib.remove gself.text-short drv.libraryHaskellDepends;
                     testHaskellDepends =
                       oself.lib.remove gself.text-short drv.testHaskellDepends;
                   }) gsuper.aeson;
+                  quickcheck-instances = oself.haskell.lib.compose.overrideCabal (drv: {
+                    patches = drv.patches or [] ++ [
+                      ./patches/short-text-qc-instances.patch
+                    ];
+                    libraryHaskellDepends =
+                      oself.lib.remove gself.text-short drv.libraryHaskellDepends;
+                  }) gsuper.quickcheck-instances;
+                  ghcjs-base = oself.haskell.lib.compose.appendPatch (./patches/loosen-aeson-ghcjs-base.patch) gsuper.ghcjs-base;
                 });
               };
             };

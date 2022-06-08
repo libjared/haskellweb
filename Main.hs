@@ -18,14 +18,20 @@ foreign import javascript unsafe "document.getElementById($1)"
 foreign import javascript unsafe "$1.textContent = $2"
     setTextContent :: JSVal -> JSString -> IO ()
 
+foreign import javascript unsafe "$1.value"
+    getValue :: JSVal -> IO JSString
+
+foreign import javascript unsafe "$1.value = $2"
+    setValue :: JSVal -> JSString -> IO ()
+
 foreign import javascript unsafe "$1.addEventListener($2, $3)"
     addEventListener :: JSVal -> JSString -> Callback (IO ()) -> IO ()
 
 foreign import javascript unsafe "document.createElement($1)"
     createElement :: JSString -> IO JSVal
 
-foreign import javascript unsafe "$1.after($2)"
-    after :: JSVal -> JSVal -> IO ()
+foreign import javascript unsafe "$1.appendChild($2)"
+    appendChild :: JSVal -> JSVal -> IO ()
 
 foreign import javascript unsafe "$1.setAttribute($2, $3)"
     setAttribute :: JSVal -> JSString -> JSString -> IO ()
@@ -42,22 +48,25 @@ foreign import javascript unsafe "$1.remove()"
 main :: IO ()
 main = do
     textbox <- getElementById "text-add"
+    addButton <- getElementById "button-add"
+    itemList <- getElementById "items"
 
     addCallback <- Callback.asyncCallback do
+        text <- getValue textbox
+        setValue textbox ""
+
         checkbox <- createElement "input"
-        setAttribute checkbox "id" "list-0"
-        setAttribute checkbox "name" "list-0"
+        setAttribute checkbox "type" "checkbox"
 
         label <- createElement "label"
-        setAttribute label "for" "list-0"
-        setTextContent label "a new item"
+        setTextContent label text
 
-        itemContainer <- createElement "div"
-        replaceChildren itemContainer [ checkbox, label ]
+        newItem <- createElement "li"
+        replaceChildren newItem [ checkbox, label ]
 
-        doneCallback <- Callback.asyncCallback (remove itemContainer)
+        doneCallback <- Callback.asyncCallback (remove newItem)
         addEventListener checkbox "click" doneCallback
 
-        after textbox itemContainer
+        appendChild itemList newItem
 
-    addEventListener textbox "click" addCallback
+    addEventListener addButton "click" addCallback

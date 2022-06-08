@@ -24,8 +24,8 @@ foreign import javascript unsafe "$1.addEventListener($2, $3)"
 foreign import javascript unsafe "document.createElement($1)"
     createElement :: JSString -> IO JSVal
 
-foreign import javascript unsafe "$1.before($2)"
-    before :: JSVal -> JSVal -> IO ()
+foreign import javascript unsafe "$1.after($2)"
+    after :: JSVal -> JSVal -> IO ()
 
 foreign import javascript unsafe "$1.setAttribute($2, $3)"
     setAttribute :: JSVal -> JSString -> JSString -> IO ()
@@ -41,25 +41,23 @@ foreign import javascript unsafe "$1.remove()"
 
 main :: IO ()
 main = do
-    addButton <- getElementById "click me"
+    textbox <- getElementById "text-add"
 
     addCallback <- Callback.asyncCallback do
-        subtractButton <- createElement "button"
+        checkbox <- createElement "input"
+        setAttribute checkbox "id" "list-0"
+        setAttribute checkbox "name" "list-0"
 
-        setTextContent subtractButton "-"
+        label <- createElement "label"
+        setAttribute label "for" "list-0"
+        setTextContent label "a new item"
 
-        input <- createElement "input"
+        itemContainer <- createElement "div"
+        replaceChildren itemContainer [ checkbox, label ]
 
-        setAttribute input "type" "text"
+        doneCallback <- Callback.asyncCallback (remove itemContainer)
+        addEventListener checkbox "click" doneCallback
 
-        div <- createElement "div"
+        after textbox itemContainer
 
-        replaceChildren div [ subtractButton, input ]
-
-        subtractCallback <- Callback.asyncCallback (remove div)
-
-        addEventListener subtractButton "click" subtractCallback
-
-        before addButton div
-        
-    addEventListener addButton "click" addCallback
+    addEventListener textbox "click" addCallback

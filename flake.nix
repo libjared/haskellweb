@@ -30,7 +30,9 @@
                     libraryHaskellDepends =
                       oself.lib.remove gself.text-short drv.libraryHaskellDepends;
                   }) gsuper.quickcheck-instances;
-                  ghcjs-base = oself.haskell.lib.compose.appendPatch (./patches/loosen-aeson-ghcjs-base.patch) gsuper.ghcjs-base;
+                  ghcjs-base = gsuper.ghcjs-base.overrideScope (jself: jsuper: {
+                    aeson = jsuper.aeson_1_5_6_0;
+                  });
                 });
               };
             };

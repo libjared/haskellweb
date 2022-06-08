@@ -14,9 +14,7 @@
             packages = osuper.haskell.packages // {
               ghcjs = osuper.haskell.packages.ghcjs.override {
                 overrides = (gself: gsuper: {
-                  ghcjs-base = gsuper.ghcjs-base.overrideScope (jself: jsuper: {
-                    aeson = jsuper.aeson_1_5_6_0;
-                  });
+                  aeson = gself.aeson_1_5_6_0;
                 });
               };
             };

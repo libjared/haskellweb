@@ -23,7 +23,9 @@
         (oself: osuper: {
           haskellPackages = osuper.haskellPackages.override {
             overrides = (gself: gsuper: {
-              ghcjs-base = oself.haskell.lib.compose.markUnbroken gself.ghcjs-base-stub;
+              ghcjs-base = (oself.haskell.lib.compose.markUnbroken gself.ghcjs-base-stub).overrideScope (jself: jsuper: {
+                aeson = gself.aeson_1_5_6_0;
+              });
             });
           };
         })

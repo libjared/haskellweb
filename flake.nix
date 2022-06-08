@@ -14,22 +14,6 @@
             packages = osuper.haskell.packages // {
               ghcjs = osuper.haskell.packages.ghcjs.override {
                 overrides = (gself: gsuper: {
-                  aeson = oself.haskell.lib.compose.overrideCabal (drv: {
-                    patches = drv.patches or [] ++ [
-                      ./patches/short-text-aeson.patch
-                    ];
-                    libraryHaskellDepends =
-                      oself.lib.remove gself.text-short drv.libraryHaskellDepends;
-                    testHaskellDepends =
-                      oself.lib.remove gself.text-short drv.testHaskellDepends;
-                  }) gsuper.aeson;
-                  quickcheck-instances = oself.haskell.lib.compose.overrideCabal (drv: {
-                    patches = drv.patches or [] ++ [
-                      ./patches/short-text-qc-instances.patch
-                    ];
-                    libraryHaskellDepends =
-                      oself.lib.remove gself.text-short drv.libraryHaskellDepends;
-                  }) gsuper.quickcheck-instances;
                   ghcjs-base = gsuper.ghcjs-base.overrideScope (jself: jsuper: {
                     aeson = jsuper.aeson_1_5_6_0;
                   });
@@ -70,7 +54,6 @@
         '';
       };
       in {
-        packages.ghcjs-base = pkgs.haskell.packages.ghcjs.ghcjs-base;
         defaultPackage = built;
         devShell = project true;
       }
